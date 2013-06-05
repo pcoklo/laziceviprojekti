@@ -88,7 +88,7 @@ void getAirHumTemp(int probe){
     Serial.println("Failed to read from DHT");
   } else {
     Serial.print(h);
-    Serial.print("%  ");
+    Serial.println("%");
     Serial.print(t);
     Serial.println("*C");
   }
@@ -159,6 +159,7 @@ void loop() {
   getAirHumTemp(AHT);
   getProbe(PH);
   getWaterTemp(DT);
+  Serial.println();
   
 
 }
