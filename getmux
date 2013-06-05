@@ -150,8 +150,8 @@ void openProbeChannel(int channel){
     }
     digitalWrite(inh, LOW);
     delay(5);
-    Serial1.print("\r");  //Get rid of errant data
-    delay(5);
+//  Serial1.print("\r");  //Get rid of errant data
+//  delay(5);
 }
 
 void getData(){
@@ -195,7 +195,7 @@ void getData(){
   else Serial.println(WT1);
   
   Serial.print("WT2: ");
-  if(WT1==0) Serial.println("E404");
+  if(WT2==0) Serial.println("E404");
   else Serial.println(WT2);
   
 }
