@@ -9,11 +9,17 @@ int C = A1;         // Control pin B
 // y -> TX
 // x -> RX,,,
 
+float PH=0;
+float AH=0;
+float AT=0;
+float WT1=0;
+float WT2=0;
+
 
 char stamp_data[50];
 byte holding;
 int AHT = 0;
-int PH = 1;
+int gPH = 1;
 int ORP = 2;
 int EC = 3;
 int DO = 4;
@@ -39,11 +45,10 @@ void getProbe(int probe) {
       for(int i=0; i<holding; i++)
         stamp_data[i]= char(Serial3.read());
         
-      float PHa = atof(stamp_data);
-      Serial.println(PHa);
+      PH = atof(stamp_data);
     }
     else {
-      Serial.println("probe not available"); 
+      PH=0; 
     }
   Serial3.end();  
 }
@@ -66,10 +71,10 @@ void getWaterTemp(int probe){
     if(sensors.getAddress(tempDeviceAddress, i)){
       float tempC = sensors.getTempC(tempDeviceAddress);
       if(i == 0){
-        Serial.println(tempC);
+        WT1=tempC;
       }
       else if (i == 1){
-        Serial.println(tempC);
+        WT2=tempC;
       }
       delay(100);
     }
@@ -81,16 +86,11 @@ void getAirHumTemp(int probe){
   dht.begin();
   openProbeChannel(probe);
   delay(10);
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
+  AH = dht.readHumidity();
+  AT = dht.readTemperature();
   
-  if (isnan(t) || isnan(h)) {
+  if (isnan(AT) || isnan(AH)) {
     Serial.println("Failed to read from DHT");
-  } else {
-    Serial.print(h);
-    Serial.println("%");
-    Serial.print(t);
-    Serial.println("*C");
   }
 }
 
@@ -154,12 +154,41 @@ void openProbeChannel(int channel){
     delay(5);
 }
 
+void getData(){
+  int i=0;
+  do{
+    getProbe(gPH);
+    i++;
+  }
+  while(PH==0 || i<3);
+  if(i>3) Serial.println("PH ima error");
+  i=0;
+  
+  do{
+    getAirHumTemp(AHT);
+    i++;
+  }
+  while(PH==0 || i<3);
+  if(i>3) Serial.println("DHT ima error");
+  i=0;
+  
+  do{
+    getWaterTemp(DT);
+    i++;
+  }
+  while(PH==0 || i<3);
+  if(i>3) Serial.println("DT ima error");
+  i=0;
+  
+  Serial.println(PH);
+  Serial.println(AH);
+  Serial.println(AT);
+  Serial.println(WT1);
+  Serial.println(WT2);
+  
+}
+
 void loop() {
   
-  getAirHumTemp(AHT);
-  getProbe(PH);
-  getWaterTemp(DT);
-  Serial.println();
-  
-
+  getData();
 }
