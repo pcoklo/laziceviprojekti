@@ -10,6 +10,7 @@ int C = A1;         // Control pin B
 // x -> RX,,,
 
 float PH=0;
+int ORP=0;
 float AH=0;
 float AT=0;
 float WT1=0;
@@ -20,7 +21,7 @@ char stamp_data[50];
 byte holding;
 int AHT = 0;
 int gPH = 1;
-int ORP = 2;
+
 int EC = 3;
 int DO = 4;
 int DT = 5;
@@ -157,32 +158,18 @@ void openProbeChannel(int channel){
 }
 
 void getData(){
-  int i=0;
-  do{
-    getProbe(gPH);
-    i++;
-  }
-  while(PH==0 || i<3);
-  i=0;
   
-  do{
-    getAirHumTemp(AHT);
-    i++;
-  }
-  while(PH==0 || i<3);
-  i=0;
+  getProbe(gPH);
   
-  do{
-    getWaterTemp(DT);
-    i++;
-  }
-  while(PH==0 || i<3);
-  i=0;
+  getAirHumTemp(AHT);
+  
+  getWaterTemp(DT);
   
   
   Serial.print("PH: ");
   if(PH==0) Serial.println("E404");
   else Serial.println(PH);
+  
   
   Serial.print("AH: ");
   if(AH==0) Serial.println("E404");
@@ -199,6 +186,10 @@ void getData(){
   Serial.print("WT2: ");
   if(WT2==0) Serial.println("E404");
   else Serial.println(WT2);
+  
+  Serial.println();
+  
+  
   
 }
 
