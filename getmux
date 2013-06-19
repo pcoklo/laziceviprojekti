@@ -1,14 +1,16 @@
+//Sistem 0.3
+#include <UTFT.h>
 #include "DHT.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-int inh = A0;    // Inhibit Line
-int A = A3;         // Control pin C 
-int B = A2;         // Control pin A
-int C = A1;         // Control pin B
-// y -> TX
-// x -> RX,,,
+//Sensable pinovi multiplexor
+int inh = A0;
+int A = A3;
+int B = A2;
+int C = A1;
 
+//parametri
 float PH=0;
 int ORP=0;
 unsigned int EC=0;
@@ -18,9 +20,11 @@ float AT=0;
 float WT1=0;
 float WT2=0;
 
-
+//Atlas sajentifik data reading
 char stamp_data[50];
 byte holding;
+
+//kanali na multiplexoru do 8;
 int AHT = 0;
 int gPH = 1;
 int gORP = 2;
@@ -28,16 +32,15 @@ int gEC = 3;
 int DO = 4;
 int DT = 5;
 
-void setup(){ 
-  Serial.begin(9600);
-  pinMode(A, OUTPUT);
-  pinMode(B, OUTPUT);
-  pinMode(C, OUTPUT);
-  pinMode(inh, OUTPUT); 
-  digitalWrite(inh, LOW);
-  
-  Serial.println("getmuxBETA 2.0");
-}
+//set za lcd
+UTFT myGLCD(CTE70,38,39,40,41);
+
+//fontovi
+extern uint8_t DotMatrix_M[];
+extern uint8_t SevenSegmentFull[];
+extern uint8_t SmallFont[];
+
+
 void getProbe(int probe) {
   Serial3.begin(38400);
     openProbeChannel(probe);
@@ -52,15 +55,11 @@ void getProbe(int probe) {
         
       if(probe==gPH) PH = atof(stamp_data);
       else if(probe==gEC){
-        for(int i=0; i<holding; i++)
-          Serial.print(char(stamp_data[i]));
-        Serial.println();
+     
       }
       else ORP = atoi(stamp_data);
     }
     else {
-      Serial.print("Error geting probe: ");
-      Serial.println(probe);
     }
     
   Serial3.end();  
@@ -106,7 +105,6 @@ void getAirHumTemp(int probe){
     Serial.println("Failed to read from DHT");
   }
 }
-
 
 void openProbeChannel(int channel){
     digitalWrite(inh, HIGH);
@@ -178,39 +176,53 @@ void getData(){
   getAirHumTemp(AHT);
   
   getWaterTemp(DT);
+}
+
+void printData(){
   
-  
-  Serial.print("PH: ");
-  if(PH==0) Serial.println("E404");
-  else Serial.println(PH);
-  
-  Serial.print("ORP: ");
-  if(ORP==0) Serial.println("E404");
-  else Serial.println(ORP);
-  
-  Serial.print("AH: ");
-  if(AH==0) Serial.println("E404");
-  else Serial.println(AH);
-  
-  Serial.print("AT: ");
-  if(AT==0) Serial.println("E404");
-  else Serial.println(AT);
-  
-  Serial.print("WT1: ");
-  if(WT1==0) Serial.println("E404");
-  else Serial.println(WT1);
-  
-  Serial.print("WT2: ");
-  if(WT2==0) Serial.println("E404");
-  else Serial.println(WT2);
-  
-  Serial.println();
-  
-  
+  //mjenjaj koordinate
+  myGLCD.setFont(SevenSegmentFull);
+  myGLCD.printNumF(PH,2,50,60);
+  myGLCD.printNumF(AH,1,50,110);
+  myGLCD.printNumF(AT,1,50,160);
+  myGLCD.printNumF(WT1,2,50,210);
+  myGLCD.printNumF(WT2,2,50,260);
+  myGLCD.printNumI(ORP,50,310);
+
+}
+
+void mainScreen(){
+  //ovdje dizajniram matrixa
+  myGLCD.clrScr();
+  myGLCD.drawRect(5,5,795,475);
+  myGLCD.setFont(DotMatrix_M);
   
 }
 
-void loop() {
+void setup(){
   
+  myGLCD.InitLCD();
+  myGLCD.clrScr();
+  myGLCD.setFont(DotMatrix_M);
+  myGLCD.setColor(VGA_BLUE);
+  myGLCD.print("LAZIC REEF CONTROLLER",CENTER,100);
+  myGLCD.print("VERSION 0.3 ", CENTER,250);
+  //dodati logo etfosov, labosov, 
+  //i neki koji smislimo naš kad budemo znali
+  
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(inh, OUTPUT); 
+  digitalWrite(inh, LOW);
+  
+  getData();
+  mainScreen();
+
+}
+
+void loop(){
+  
+  printData();
   getData();
 }
