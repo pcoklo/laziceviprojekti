@@ -49,18 +49,20 @@ void getProbe(int probe) {
       holding=Serial3.available();  
       for(int i=0; i<holding; i++)
         stamp_data[i]= char(Serial3.read());
-      
-    if(probe==gPH) PH = atof(stamp_data);
-    
-    else if(probe==gEC){
-      for(int i=0; i<holding; i++)
-        Serial.print(char(stamp_data[i]));
-      Serial.println();
-      
+        
+      if(probe==gPH) PH = atof(stamp_data);
+      else if(probe==gEC){
+        for(int i=0; i<holding; i++)
+          Serial.print(char(stamp_data[i]));
+        Serial.println();
+      }
+      else ORP = atoi(stamp_data);
+    }
+    else {
+      Serial.print("Error geting probe: ");
+      Serial.println(probe);
     }
     
-    else ORP = atoi(stamp_data);
-    }
   Serial3.end();  
 }
 
