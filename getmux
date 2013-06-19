@@ -11,6 +11,8 @@ int C = A1;         // Control pin B
 
 float PH=0;
 int ORP=0;
+unsigned int EC=0;
+unsigned int PPM=0;
 float AH=0;
 float AT=0;
 float WT1=0;
@@ -22,7 +24,7 @@ byte holding;
 int AHT = 0;
 int gPH = 1;
 int gORP = 2;
-int EC = 3;
+int gEC = 3;
 int DO = 4;
 int DT = 5;
 
@@ -49,10 +51,15 @@ void getProbe(int probe) {
         stamp_data[i]= char(Serial3.read());
       
     if(probe==gPH) PH = atof(stamp_data);
-    else ORP = atoi(stamp_data);
+    
+    else if(probe==gEC){
+      for(int i=0; i<holding; i++)
+        Serial.print(char(stamp_data[i]));
+      Serial.println();
+      
     }
-    else {
-      PH=0; 
+    
+    else ORP = atoi(stamp_data);
     }
   Serial3.end();  
 }
@@ -163,6 +170,8 @@ void getData(){
   getProbe(gPH);
   
   getProbe(gORP);
+  
+  getProbe(gEC);
   
   getAirHumTemp(AHT);
   
